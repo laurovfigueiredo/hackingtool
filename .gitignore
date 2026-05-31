@@ -182,4 +182,23 @@ poetry.toml
 pyvenv.cfg
 pip-selfcheck.json
 
+# Tool install dirs (created by git clone during install)
+nmap/
+Dracnmap/
+RED_HAWK/
+reconspider/
+Infoga/
+ReconDog/
+Striker/
+secretfinder/
+Shodanfy.py/
+rang3r/
+Breacher/
+theHarvester/
+XeroSploit/
+# Deb packages downloaded during install
+*.deb
+# Web log
+web.log
+
 # End of https://www.toptal.com/developers/gitignore/api/python,venv

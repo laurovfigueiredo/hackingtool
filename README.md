@@ -39,7 +39,9 @@ venv/bin/pip install -r web/requirements.txt
 venv/bin/python web/app.py
 ```
 
-Then open **http://localhost:5000** in your browser.
+Then open **http://localhost:8080** in your browser.
+
+> Para usar outra porta: `PORT=9090 venv/bin/python web/app.py`
 
 Features:
 - Category grid with install status

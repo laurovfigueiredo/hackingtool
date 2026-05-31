@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HackingTool Web</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a2e;--border:#2a2a4a;--primary:#a855f7;--primary-dim:#7c3aed;--accent:#06b6d4;--success:#22c55e;--error:#ef4444;--warn:#f59e0b;--text:#e2e8f0;--dim:#64748b}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.container{max-width:1400px;margin:0 auto;padding:20px}
+
+/* Header */
+header{background:linear-gradient(135deg,var(--surface),var(--card));border-bottom:1px solid var(--border);padding:16px 0;margin-bottom:30px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+header .container{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo{font-size:24px;font-weight:800;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.5px}
+.logo span{font-weight:400;opacity:.5}
+.search-box{flex:1;max-width:500px;position:relative}
+.search-box input{width:100%;padding:10px 16px 10px 40px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;transition:border-color .2s}
+.search-box input:focus{border-color:var(--primary)}
+.search-box .icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:16px}
+.close-btn{background:none;border:none;color:var(--dim);font-size:24px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all .2s}
+.close-btn:hover{color:var(--text);background:var(--border)}
+
+h1{font-size:28px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+h1 small{font-size:14px;color:var(--dim);font-weight:400}
+.subtitle{color:var(--dim);margin-bottom:24px;font-size:14px}
+
+/* Category Grid */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:30px}
+.cat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all .25s ease;position:relative;overflow:hidden}
+.cat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent));opacity:0;transition:opacity .25s}
+.cat-card:hover{transform:translateY(-2px);border-color:var(--primary);box-shadow:0 8px 30px rgba(168,85,247,.15)}
+.cat-card:hover::before{opacity:1}
+.cat-card .icon{font-size:32px;margin-bottom:8px}
+.cat-card h3{font-size:15px;font-weight:600;margin-bottom:6px}
+.cat-card .meta{font-size:12px;color:var(--dim)}
+.cat-card .meta .ok{color:var(--success)}
+.cat-card .count{font-size:11px;background:var(--surface);padding:2px 8px;border-radius:20px;color:var(--dim)}
+
+/* Tool Detail */
+.tool-detail{display:none}
+.tool-detail.active{display:block}
+.tool-header{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px}
+.tool-header h2{font-size:22px;margin-bottom:8px}
+.tool-header .desc{color:var(--dim);line-height:1.6;margin-bottom:12px;white-space:pre-wrap}
+.tool-header .meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tool-header .meta span{font-size:12px;padding:3px 10px;border-radius:20px;background:var(--surface);border:1px solid var(--border)}
+.tool-header .meta .installed{background:rgba(34,197,94,.1);border-color:var(--success);color:var(--success)}
+.tool-header .meta .not-installed{background:rgba(100,116,139,.1);border-color:var(--dim);color:var(--dim)}
+.tool-header .meta .root{background:rgba(245,158,11,.1);border-color:var(--warn);color:var(--warn)}
+.tool-header .actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dim);transform:translateY(-1px)}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{opacity:.9;transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+
+/* Terminal */
+.terminal{background:#000;border:1px solid var(--border);border-radius:10px;font-family:'JetBrains Mono','Fira Code',monospace;font-size:13px;line-height:1.5;overflow:hidden}
+.terminal-bar{background:var(--surface);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);font-size:12px;color:var(--dim)}
+.terminal-bar .dots{display:flex;gap:6px}
+.terminal-bar .dot{width:10px;height:10px;border-radius:50%}
+.terminal-bar .dot.r{background:#ef4444}
+.terminal-bar .dot.y{background:#f59e0b}
+.terminal-bar .dot.g{background:#22c55e}
+.terminal-bar .title{flex:1;text-align:center;font-size:11px;color:var(--dim)}
+.terminal-output{padding:16px;max-height:500px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;color:#22c55e;min-height:100px}
+.terminal-output:empty::after{content:'Waiting for output...';color:var(--dim);font-style:italic}
+
+/* Tool list */
+.tool-table{width:100%;border-collapse:collapse}
+.tool-table th{text-align:left;padding:10px 14px;font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+.tool-table td{padding:12px 14px;border-bottom:1px solid rgba(42,42,74,.3);font-size:14px}
+.tool-table tr{cursor:pointer;transition:background .15s}
+.tool-table tr:hover{background:rgba(168,85,247,.05)}
+.tool-table .status{font-size:16px}
+.tool-table .status.ok{color:var(--success)}
+.tool-table .status.no{color:var(--dim)}
+.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--accent);cursor:pointer;margin-bottom:16px;font-size:14px;transition:color .2s}
+.back-link:hover{color:var(--primary)}
+.loading{text-align:center;padding:60px;color:var(--dim)}
+.spinner{display:inline-block;width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:768px){.cat-grid{grid-template-columns:1fr 1fr}.container{padding:12px}}
+@media(max-width:500px){.cat-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<div class="container">
+<div class="logo" onclick="location.reload()" style="cursor:pointer">HackingTool <span>Web</span></div>
+<div class="search-box">
+<span class="icon">&#128269;</span>
+<input type="text" id="search" placeholder="Search 185+ tools by name, description, keyword..." oninput="doSearch(this.value)">
+</div>
+</div>
+</header>
+<div class="container" id="app">
+<div id="categories-view">
+<div class="subtitle">All-in-One Hacking Tool — 20 categories, 185+ tools</div>
+<div class="cat-grid" id="cat-grid"></div>
+</div>
+<div id="tool-detail" class="tool-detail"></div>
+</div>
+
+<script>
+let allCategories = [];
+let currentCatId = null;
+
+async function loadCategories() {
+    const res = await fetch('/api/categories');
+    allCategories = await res.json();
+    const grid = document.getElementById('cat-grid');
+    grid.innerHTML = allCategories.map(c => `
+        <div class="cat-card" onclick="loadCategory(${c.id})">
+            <div class="icon">${c.icon}</div>
+            <h3>${c.name}</h3>
+            <div class="meta"><span class="ok">${c.installed}</span>/${c.tool_count} tools</div>
+        </div>
+    `).join('');
+}
+
+async function loadCategory(id) {
+    currentCatId = id;
+    document.getElementById('categories-view').style.display = 'none';
+    const detail = document.getElementById('tool-detail');
+    detail.classList.add('active');
+    detail.innerHTML = '<div class="loading"><div class="spinner"></div><div>Loading tools...</div></div>';
+    const res = await fetch(`/api/category/${id}`);
+    const data = await res.json();
+    document.getElementById('tool-detail').innerHTML = `
+        <div class="back-link" onclick="backToCategories()">&larr; Back to Categories</div>
+        <h1>${data.icon} ${data.name} <small>${data.tools.length} tools</small></h1>
+        <table class="tool-table">
+            <thead><tr><th style="width:30px"></th><th>Tool</th><th>Description</th></tr></thead>
+            <tbody>${data.tools.map((t,i) => `
+                <tr onclick="showTool(${id},${i})">
+                    <td class="status ${t.is_installed?'ok':'no'}">${t.is_installed?'&#10003;':'&#10007;'}</td>
+                    <td><strong>${t.title}</strong></td>
+                    <td style="color:var(--dim);font-size:13px">${t.description||'—'}</td>
+                </tr>
+            `).join('')}</tbody>
+        </table>
+    `;
+}
+
+async function showTool(catId, toolId) {
+    const res = await fetch(`/api/category/${catId}`);
+    const data = await res.json();
+    const t = data.tools[toolId];
+    const detail = document.getElementById('tool-detail');
+    detail.innerHTML = `
+        <div class="back-link" onclick="loadCategory(${catId})">&larr; Back to ${data.name}</div>
+        <div class="tool-header">
+            <h2>${t.title}</h2>
+            <div class="desc">${t.description_full || t.description || 'No description available.'}</div>
+            <div class="meta">
+                <span class="${t.is_installed?'installed':'not-installed'}">${t.is_installed?'&#10003; Installed':'&#10007; Not Installed'}</span>
+                ${t.requires_root ? '<span class="root">&#9888; Requires Root</span>' : ''}
+                <span>&#128190; ${t.supported_os.join(', ')}</span>
+                ${t.tags.map(tag => `<span>#${tag}</span>`).join('')}
+                ${t.project_url ? `<span><a href="${t.project_url}" target="_blank" style="color:var(--accent);text-decoration:none">&#128279; Project</a></span>` : ''}
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" onclick="execTool(${catId},${toolId},'install',this)" ${!t.installable?'disabled':''}>Install</button>
+                <button class="btn btn-success" onclick="execTool(${catId},${toolId},'run',this)" ${!t.runnable?'disabled':''}>Run</button>
+                <button class="btn btn-outline" onclick="execTool(${catId},${toolId},'update',this)" ${!t.installable?'disabled':''}>Update</button>
+            </div>
+        </div>
+        <div class="terminal" id="terminal-${catId}-${toolId}">
+            <div class="terminal-bar">
+                <div class="dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+                <div class="title">Terminal Output</div>
+                <div></div>
+            </div>
+            <div class="terminal-output" id="output-${catId}-${toolId}"></div>
+        </div>
+    `;
+}
+
+async function execTool(catId, toolId, action, btn) {
+    const output = document.getElementById(`output-${catId}-${toolId}`);
+    output.textContent = '';
+    btn.disabled = true;
+    btn.textContent = action === 'install' ? 'Installing...' : action === 'run' ? 'Running...' : 'Updating...';
+
+    try {
+        const res = await fetch(`/api/tool/${catId}/${toolId}/${action}`, {method:'POST'});
+        const data = await res.json();
+        if (data.error) {
+            output.textContent = `Error: ${data.error}`;
+            btn.disabled = false;
+            btn.textContent = action.charAt(0).toUpperCase() + action.slice(1);
+            return;
+        }
+        output.textContent += `$ ${data.command}\n`;
+        const stream = await fetch(`/api/stream/${data.task_id}`);
+        const reader = stream.body.getReader();
+        const decoder = new TextDecoder();
+        while (true) {
+            const {done, value} = await reader.read();
+            if (done) break;
+            output.textContent += decoder.decode(value);
+            output.scrollTop = output.scrollHeight;
+        }
+        btn.textContent = action === 'install' ? 'Reinstall' : action === 'run' ? 'Run Again' : 'Update';
+    } catch (e) {
+        output.textContent += `\nError: ${e}`;
+    }
+    btn.disabled = false;
+}
+
+function backToCategories() {
+    document.getElementById('categories-view').style.display = 'block';
+    const detail = document.getElementById('tool-detail');
+    detail.classList.remove('active');
+    detail.innerHTML = '';
+    document.getElementById('search').value = '';
+}
+
+let searchTimeout = null;
+async function doSearch(q) {
+    clearTimeout(searchTimeout);
+    const detail = document.getElementById('tool-detail');
+    if (!q.trim()) {
+        if (!detail.classList.contains('active')) {
+            document.getElementById('categories-view').style.display = 'block';
+        }
+        return;
+    }
+    searchTimeout = setTimeout(async () => {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+        const results = await res.json();
+        if (results.length === 0) {
+            detail.innerHTML = '<div class="back-link" onclick="backToCategories()">&larr; Back</div><div style="text-align:center;padding:40px;color:var(--dim)">No tools found matching "'+q+'"</div>';
+        } else {
+            detail.innerHTML = `
+                <div class="back-link" onclick="backToCategories()">&larr; Back</div>
+                <h1>Search: "${q}" <small>${results.length} results</small></h1>
+                <table class="tool-table">
+                    <thead><tr><th style="width:30px"></th><th>Tool</th><th>Category</th><th>Description</th></tr></thead>
+                    <tbody>${results.map((t,i) => `
+                        <tr onclick="findAndShowTool('${t.title}')">
+                            <td class="status ${t.is_installed?'ok':'no'}">${t.is_installed?'&#10003;':'&#10007;'}</td>
+                            <td><strong>${t.title}</strong></td>
+                            <td style="color:var(--dim)">${t.category_icon} ${t.category}</td>
+                            <td style="color:var(--dim);font-size:13px">${t.description||'—'}</td>
+                        </tr>
+                    `).join('')}</tbody>
+                </table>
+            `;
+        }
+        detail.classList.add('active');
+        document.getElementById('categories-view').style.display = 'none';
+    }, 300);
+}
+
+async function findAndShowTool(title) {
+    for (let i = 0; i < allCategories.length; i++) {
+        const res = await fetch(`/api/category/${i}`);
+        const data = await res.json();
+        const idx = data.tools.findIndex(t => t.title === title);
+        if (idx >= 0) {
+            await loadCategory(i);
+            showTool(i, idx);
+            return;
+        }
+    }
+}
+
+loadCategories();
+</script>
+</body>
+</html>

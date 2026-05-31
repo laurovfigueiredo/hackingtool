@@ -28,6 +28,30 @@
 
 ## What's New in v2.0.0
 
+### 🌐 Web GUI Interface (New!)
+
+This fork adds a **Web Graphical Interface** alongside the CLI. Access all 185+ tools through your browser:
+
+```bash
+cd hackingtool
+python3 -m venv venv
+venv/bin/pip install -r web/requirements.txt
+venv/bin/python web/app.py
+```
+
+Then open **http://localhost:5000** in your browser.
+
+Features:
+- Category grid with install status
+- Search across all 185+ tools
+- Real-time terminal output via SSE
+- Install, Run, and Update tools from the browser
+- Mobile-responsive design
+
+---
+
+## What's New in v2.0.0
+
 <table>
 <tr><td>
 
@@ -438,7 +462,7 @@ Required: class in `tools/*.py`, TITLE, DESCRIPTION, INSTALL/RUN commands, SUPPO
 ### One-liner (recommended)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/Z4nzu/hackingtool/master/install.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/laurovfigueiredo/hackingtool/master/install.sh | sudo bash
 ```
 
 Handles everything — prerequisites, clone, venv, launcher.
@@ -449,7 +473,7 @@ Handles everything — prerequisites, clone, venv, launcher.
 ### Manual
 
 ```bash
-git clone https://github.com/Z4nzu/hackingtool.git
+git clone https://github.com/laurovfigueiredo/hackingtool.git
 cd hackingtool
 sudo python3 install.py
 ```
